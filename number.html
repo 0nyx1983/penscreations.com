@@ -6,44 +6,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guess the Number</title>
     <style>
-    body {
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        background-image: url("images/rainbow_numbers.webp");
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        display: flex;
-    }
-    .game-container {
-        flex: 2;
-        padding: 20px;
-    }
-    .guess-list {
-        flex: 1;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: azure;
-        padding: 20px;
-        overflow-y: auto;
-    }
-    h1, h2 {
-        font-family: 'Courier New', Courier, monospace;
-        text-align: center;
-        font-size: 52px;
-        color: azure;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-    p {
-        color: azure;
-        font-size: 20px;
-        text-align: center;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-    #message {
-        margin: 20px 0;
-        font-weight: bold;
-    }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-image: url("images/rainbow_numbers.webp");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+        }
+
+        .game-container {
+            flex: 2;
+            padding: 20px;
+        }
+
+        .guess-list {
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: azure;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        h1,
+        h2 {
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            font-size: 52px;
+            color: azure;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        p {
+            color: azure;
+            font-size: 20px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #message {
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
     </style>
 </head>
 
@@ -62,12 +78,13 @@
         <h2>Your Guesses</h2>
         <ul id="guessList"></ul>
     </div>
+    <canvas id="confettiCanvas"></canvas>
 
     <script>
         let targetNumber = Math.floor(Math.random() * 100) + 1;
         let attempts = 0;
 
-        document.getElementById('guessInput').addEventListener('keyup', function(event) {
+        document.getElementById('guessInput').addEventListener('keyup', function (event) {
             if (event.key === 'Enter') {
                 checkGuess();
             }
@@ -86,17 +103,21 @@
             let listItem = document.createElement('li');
             listItem.textContent = `Guess #${attempts}: ${guess}`;
             document.getElementById('guessList').appendChild(listItem);
-
+            
+            // Check if the guess is correct
             if (guess === targetNumber) {
+                // gueess is correct
                 document.getElementById('message').textContent = `Congratulations! You guessed the number in ${attempts} attempts!`;
                 document.getElementById('guessInput').disabled = true;
+                // show confetti
+                createConfetti();
             } else {
                 if (guess < targetNumber) {
                     document.getElementById('message').textContent = "Too low! Try a higher number.";
                 } else {
                     document.getElementById('message').textContent = "Too high! Try a lower number.";
                 }
-                
+
                 document.getElementById('guessInput').disabled = true;
                 document.querySelector('button').disabled = true;
 
@@ -110,6 +131,58 @@
 
             document.getElementById('attempts').textContent = `Attempts: ${attempts}`;
         }
+        function createConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const confettiCount = 200;
+            const confetti = [];
+
+            for (let i = 0; i < confettiCount; i++) {
+                confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 5 + 1,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    speed: Math.random() * 3 + 1,
+                    angle: Math.random() * 360
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < confetti.length; i++) {
+                    const c = confetti[i];
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.size, 0, 2 * Math.PI);
+                    ctx.fillStyle = c.color;
+                    ctx.fill();
+
+                    c.y += c.speed;
+                    c.x += Math.sin(c.angle) * 2;
+
+                    if (c.y > canvas.height) {
+                        confetti[i] = {
+                            x: Math.random() * canvas.width,
+                            y: 0,
+                            size: c.size,
+                            color: c.color,
+                            speed: c.speed,
+                            angle: c.angle
+                        };
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
     </script>
 </body>
+
 </html>
