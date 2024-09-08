@@ -21,18 +21,22 @@
             color: #fff;
             word-wrap: break-word;
             overflow-wrap: break-word;
-        }
 
+        }
         /* Neon background */
         body::before {
             content: "";
             position: absolute;
-            top: -50%;
-            left: -50%;
-            right: -50%;
-            bottom: -50%;
+            top: -65%;  /* Increase this value to zoom in more */
+            left: -65%;  /* Increase this value to zoom in more */
+            right: -65%;  /* Increase this value to zoom in more */
+            bottom: -65%;  /* Increase this value to zoom in more */
             z-index: -1;
-            background: 
+            background-image: url("images/rainbow_numbers.webp");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            /* background: 
                 repeating-linear-gradient(0deg,
                     transparent,
                     transparent 50px,
@@ -48,7 +52,7 @@
                     rgba(0, 255, 255, 0.3) 51px,
                     transparent 51px,
                     transparent 100px
-                );
+                ); */
             filter: blur(1px);
             animation: moveBackground 20s linear infinite;
         }
@@ -201,9 +205,11 @@
         function checkGuess() {
             let guess = document.getElementById('guessInput').value;
             
-            if (guess === '') {
+            if (guess === '' || isNaN(guess) || guess < 1 || guess > 100) {
+                document.getElementById('errorMessage').textContent = "Please enter a number between 1 and 100";
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('guessInput').classList.add('error');
+                document.getElementById('guessInput').value = '';
                 return;
             }
 
