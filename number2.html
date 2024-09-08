@@ -5,22 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guess the Number Game</title>
     <style>
-        /* Basic styling to center content and add some spacing */
+        /* Base styles */
         body {
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
             position: relative;
             overflow: hidden;
-            background-color: #000; /* Dark background to make neon colors pop */
-            color: #fff; /* White text for better contrast */
+            background-color: #000;
+            color: #fff;
         }
 
-        /* Create the neon numbers background */
+        /* Neon background */
         body::before {
             content: "";
             position: absolute;
@@ -29,13 +30,11 @@
             right: -50%;
             bottom: -50%;
             z-index: -1;
-            
-            /* Create the background with neon numbers */
             background: 
                 repeating-linear-gradient(0deg,
                     transparent,
                     transparent 50px,
-                    rgba(255, 0, 255, 0.3) 50px, /* Neon pink */
+                    rgba(255, 0, 255, 0.3) 50px,
                     rgba(255, 0, 255, 0.3) 51px,
                     transparent 51px,
                     transparent 100px
@@ -43,60 +42,66 @@
                 repeating-linear-gradient(90deg,
                     transparent,
                     transparent 50px,
-                    rgba(0, 255, 255, 0.3) 50px, /* Neon cyan */
+                    rgba(0, 255, 255, 0.3) 50px,
                     rgba(0, 255, 255, 0.3) 51px,
                     transparent 51px,
                     transparent 100px
                 );
-            
-            /* Add a glow effect */
             filter: blur(1px);
-            
-            /* Animate the background */
             animation: moveBackground 20s linear infinite;
         }
 
-        /* Define the animation for the background movement */
         @keyframes moveBackground {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
+        /* Responsive container styles */
         .game-container, .guess-list {
-            width: 100%;
+            width: 90%;
             max-width: 400px;
             margin-bottom: 20px;
-            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black */
-            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Additional styles for better visual appeal */
         h1, h2 {
-            color: #0ff; /* Neon cyan for headings */
-            text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff; /* Glow effect */
+            color: #0ff;
+            text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff;
+            font-size: 1.5em;
+            margin-top: 0;
         }
 
-        input, button {
-            margin: 10px 0;
+        p {
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        /* Form element styles */
+        #guessInput {
+            width: calc(100% - 20px);
             padding: 10px;
+            margin-bottom: 10px;
             border-radius: 5px;
             border: none;
             background-color: rgba(255, 255, 255, 0.1);
             color: #fff;
-        }
-
-        input {
-            width: calc(100% - 20px);
+            font-size: 1em;
         }
 
         button {
-            background-color: #f0f; /* Neon pink */
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #f0f;
             color: #fff;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 1em;
         }
 
         button:hover {
@@ -104,11 +109,40 @@
             box-shadow: 0 0 10px #f0f;
         }
 
+        /* Guess list styles */
+        #guessList {
+            padding-left: 20px;
+        }
+
         #guessList li {
             margin: 5px 0;
             padding: 5px;
             border-radius: 3px;
             background-color: rgba(255, 255, 255, 0.1);
+            font-size: 0.9em;
+        }
+
+        /* Media query for larger screens */
+        @media (min-width: 768px) {
+            h1, h2 {
+                font-size: 2em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+
+            .game-container, .guess-list {
+                padding: 20px;
+            }
+
+            #guessInput, button {
+                font-size: 1.1em;
+            }
+
+            #guessList li {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -126,42 +160,29 @@
     </div>
 
     <script>
-        // Generate a random number between 1 and 100
         let secretNumber = Math.floor(Math.random() * 100) + 1;
-        
-        // Keep track of the number of guesses
         let guessCount = 0;
 
         function checkGuess() {
-            // Get the player's guess from the input field
             let guess = parseInt(document.getElementById('guessInput').value);
-            
-            // Increase the guess count
             guessCount++;
 
-            // Get the list where we'll show the guesses
             let guessList = document.getElementById('guessList');
-            
-            // Create a new list item for this guess
             let listItem = document.createElement('li');
 
-            // Check if the guess is correct
             if (guess === secretNumber) {
                 listItem.textContent = `${guess} - Correct! You won in ${guessCount} guesses!`;
-                listItem.style.color = '#0f0'; // Neon green for correct guess
-                listItem.style.textShadow = '0 0 5px #0f0, 0 0 10px #0f0'; // Glow effect
+                listItem.style.color = '#0f0';
+                listItem.style.textShadow = '0 0 5px #0f0, 0 0 10px #0f0';
             } else if (guess < secretNumber) {
                 listItem.textContent = `${guess} - Too low, try again!`;
-                listItem.style.color = '#f00'; // Neon red for low guess
+                listItem.style.color = '#f00';
             } else {
                 listItem.textContent = `${guess} - Too high, try again!`;
-                listItem.style.color = '#00f'; // Neon blue for high guess
+                listItem.style.color = '#00f';
             }
 
-            // Add the new guess to the list
             guessList.appendChild(listItem);
-
-            // Clear the input field for the next guess
             document.getElementById('guessInput').value = '';
         }
     </script>
