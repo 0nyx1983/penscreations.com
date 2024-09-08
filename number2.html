@@ -13,12 +13,14 @@
             align-items: center;
             justify-content: center;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             min-height: 100vh;
             position: relative;
             overflow: hidden;
             background-color: #000;
             color: #fff;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         /* Neon background */
@@ -58,11 +60,11 @@
 
         /* Responsive container styles */
         .game-container, .guess-list {
-            width: 90%;
-            max-width: 400px;
-            margin-bottom: 20px;
+            width: 95%;
+            max-width: none;
+            margin-bottom: 15px;
             background-color: rgba(0, 0, 0, 0.7);
-            padding: 15px;
+            padding: 10px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -71,37 +73,37 @@
         h1, h2 {
             color: #0ff;
             text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff;
-            font-size: 1.5em;
+            font-size: 1.3em;
             margin-top: 0;
         }
 
         p {
-            font-size: 0.9em;
-            margin-bottom: 15px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
         }
 
         /* Form element styles */
         #guessInput {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 10px;
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
             border-radius: 5px;
             border: none;
             background-color: rgba(255, 255, 255, 0.1);
             color: #fff;
-            font-size: 1em;
+            font-size: 0.9em;
         }
 
         button {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             border: none;
             background-color: #f0f;
             color: #fff;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1em;
+            font-size: 0.9em;
         }
 
         button:hover {
@@ -111,38 +113,27 @@
 
         /* Guess list styles */
         #guessList {
-            padding-left: 20px;
+            padding-left: 10px;
         }
 
         #guessList li {
-            margin: 5px 0;
-            padding: 5px;
+            margin: 3px 0;
+            padding: 3px 5px;
             border-radius: 3px;
             background-color: rgba(255, 255, 255, 0.1);
-            font-size: 0.9em;
+            font-size: 0.8em;
         }
 
-        /* Media query for larger screens */
-        @media (min-width: 768px) {
-            h1, h2 {
-                font-size: 2em;
-            }
-
-            p {
-                font-size: 1em;
-            }
-
+        @media (min-width: 480px) {
             .game-container, .guess-list {
-                padding: 20px;
+                width: 90%;
+                max-width: 400px;
+                padding: 15px;
             }
-
-            #guessInput, button {
-                font-size: 1.1em;
-            }
-
-            #guessList li {
-                font-size: 1em;
-            }
+            h1, h2 { font-size: 1.8em; }
+            p { font-size: 1em; }
+            #guessInput, button { font-size: 1em; }
+            #guessList li { font-size: 0.9em; }
         }
     </style>
 </head>
