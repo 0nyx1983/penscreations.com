@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <style>
+    <head>
+        <style>
         body {
             margin: 0;
             padding: 0;
@@ -12,6 +12,16 @@
             background-repeat: no-repeat;
             background-size: cover;
             display: flex;
+        }
+        button {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background-color: #f0f;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
         }
         .game-container {
             flex: 2;
@@ -76,23 +86,27 @@
             color: #00ffff;
             text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff, 0 0 20px #00ffff;
         }
+        .win-message {
+            color: #0ff;
+            text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff;
+        }
 
     </style>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tic-tac-toe</title>
-</head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>tic-tac-toe</title>
+    </head>
 
-<body>
-    <div class="game-container">
-        <h1>tic-tac-toe</h1>
-        <div id="board"></div>
-        <div id="status"></div>
-        <button id="playAgain" style="display: none;">Play Again</button>
-    </div>
-    <canvas id="confettiCanvas"></canvas>
+    <body>
+        <div class="game-container">
+            <h1>tic-tac-toe</h1>
+            <div id="board"></div>
+            <div id="status"></div>
+            <button id="playAgain" style="display: none;">Play Again</button>
+        </div>
+        <canvas id="confettiCanvas"></canvas>
 
-    <script>
+        <script>
         const board = document.getElementById('board');
         const status = document.getElementById('status');
         let currentPlayer = 'X';
@@ -116,7 +130,12 @@
                 e.target.textContent = currentPlayer;
                 e.target.setAttribute('data-player', currentPlayer);
                 if (checkWin()) {
-                    status.textContent = `Player ${currentPlayer} wins!`;
+                    if (currentPlayer === 'X') {
+                        status.textContent = `Player ${currentPlayer} wins!`;
+                        status.classList.add('win-message');
+                    } else {
+                        status.textContent = `Player ${currentPlayer} wins!`;
+                    }
                     gameActive = false;
                     showPlayAgainButton();
                     if (currentPlayer === 'X') {
@@ -233,12 +252,12 @@
             document.getElementById('playAgain').style.display = 'block';
             document.getElementById('playAgain').addEventListener('click', resetGame);
         }
-
         function resetGame() {
             gameBoard = ['', '', '', '', '', '', '', '', ''];
             gameActive = true;
             currentPlayer = 'X';
             status.textContent = "Your turn";
+            status.classList.remove('win-message');
             document.getElementById('playAgain').style.display = 'none';
             document.getElementById('playAgain').removeEventListener('click', resetGame);
             
@@ -268,6 +287,6 @@
         createBoard();
         status.textContent = "Your turn";
     </script>
-</body>
+    </body>
 
 </html>
