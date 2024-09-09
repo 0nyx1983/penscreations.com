@@ -3,7 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=360, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="counter.js"></script>
+    <link rel="stylesheet" href="visitcounter.css">
     <title>Guess the Number</title>
     <style>
         body {
@@ -72,6 +75,7 @@
             <button style="font-size: x-large;" onclick="checkGuess()">Submit Guess</button>
             <p id="message"></p>
             <p id="guessCount"></p>
+            <div id="visitCounter"><span id="visitCount">0</span></div>
         </div>
     </div>
     <div class="guess-list">
@@ -81,6 +85,8 @@
     <canvas id="confettiCanvas"></canvas>
 
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        updateVisitCount('visitCount');
         let secretNumber = Math.floor(Math.random() * 100) + 1;
         let guessCount = 0;
 
@@ -181,7 +187,7 @@
 
             animate();
         }
-
+    });
     </script>
 </body>
 

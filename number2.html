@@ -2,7 +2,10 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=360, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="counter.js"></script>
+        <link rel="stylesheet" href="visitcounter.css">
         <title>Guess the Number Game</title>
         <style>
         /* Base styles */
@@ -180,6 +183,8 @@
     </style>
     </head>
     <body>
+        <audio id="winSound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_bf3620f48d.mp3"></audio>
+        <audio id="errorSound" src="https://www.soundjay.com/buttons/button-13.mp3"></audio>
         <div class="game-container">
             <div id="errorMessage">Please enter a guess</div>
             <h1>Guess the Number</h1>
@@ -195,158 +200,168 @@
             <ul id="guessList"></ul>
         </div>
 
-        <!-- Add the canvas element for confetti -->
+        <!-- Display the visit counter -->
+        <div id="visitCounter"><span id="visitCount">0</span></div>
+        
+        <!-- Display the canvas element for confetti -->
         <canvas id="confettiCanvas"></canvas>
 
         <script>
-        let secretNumber = Math.floor(Math.random() * 100) + 1;
-        let guessCount = 0;
+document.addEventListener('DOMContentLoaded', () => {
+    updateVisitCount('visitCount');
 
-        function checkGuess() {
-            let guess = document.getElementById('guessInput').value;
-            
-            if (guess === '' || isNaN(guess) || guess < 1 || guess > 100) {
-                document.getElementById('errorMessage').textContent = "Please enter a number between 1 and 100";
-                document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('guessInput').classList.add('error');
-                document.getElementById('guessInput').value = '';
-                return;
-            }
+    let secretNumber = Math.floor(Math.random() * 100) + 1;
+    let guessCount = 0;
 
-            guess = parseInt(guess);
-            guessCount++;
+    function checkGuess() {
+        let guess = document.getElementById('guessInput').value;
+        
+        if (guess === '' || isNaN(guess) || guess < 1 || guess > 100) {
+            document.getElementById('errorSound').play();
+            document.getElementById('errorMessage').textContent = "Please enter a number between 1 and 100";
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('guessInput').classList.add('error');
+            document.getElementById('guessInput').value = '';
+            return;
+        }
 
-            let guessList = document.getElementById('guessList');
-            let listItem = document.createElement('li');
+        guess = parseInt(guess);
+        guessCount++;
 
-            if (guess === secretNumber) {
-                listItem.textContent = `${guess} - Correct! You won in ${guessCount} guesses!`;
-                listItem.style.color = '#0f0';
-                listItem.style.textShadow = '0 0 5px #0f0, 0 0 10px #0f0';
-                // Call the createConfetti function when the guess is correct
-                createConfetti();
-                document.getElementById('submitButton').textContent = 'Play Again';
-                document.getElementById('submitButton').onclick = resetGame;
+        let guessList = document.getElementById('guessList');
+        let listItem = document.createElement('li');
+
+        if (guess === secretNumber) {
+            listItem.textContent = `${guess} - Correct! You won in ${guessCount} guesses!`;
+            listItem.style.color = '#0f0';
+            listItem.style.textShadow = '0 0 5px #0f0, 0 0 10px #0f0';
+            // Call the createConfetti function when the guess is correct
+            createConfetti();
+            // and play a sound whynot
+            document.getElementById('winSound').play();
+            document.getElementById('submitButton').textContent = 'Play Again';
+            document.getElementById('submitButton').onclick = resetGame;
+        } else {
+            if (guess < secretNumber) {
+                listItem.textContent = `${guess} - Too low, try again!`;
+                listItem.style.color = '#f00';
             } else {
-                if (guess < secretNumber) {
-                    listItem.textContent = `${guess} - Too low, try again!`;
-                    listItem.style.color = '#f00';
-                } else {
-                    listItem.textContent = `${guess} - Too high, try again!`;
-                    listItem.style.color = '#09f';
-                }
+                listItem.textContent = `${guess} - Too high, try again!`;
+                listItem.style.color = '#09f';
             }
-
-            guessList.insertBefore(listItem, guessList.firstChild);
-            document.getElementById('guessInput').value = '';
-            document.getElementById('guessInput').classList.remove('error');
-            document.getElementById('errorMessage').style.display = 'none';
         }
 
-        function resetGame() {
-            secretNumber = Math.floor(Math.random() * 100) + 1;
-            guessCount = 0;
-            document.getElementById('guessList').innerHTML = '';
-            document.getElementById('guessInput').value = '';
-            document.getElementById('submitButton').textContent = 'Submit Guess';
-            document.getElementById('submitButton').onclick = checkGuess;
-            document.getElementById('guessInput').focus();
-            clearConfetti();
+        guessList.insertBefore(listItem, guessList.firstChild);
+        document.getElementById('guessInput').value = '';
+        document.getElementById('guessInput').classList.remove('error');
+        document.getElementById('errorMessage').style.display = 'none';
+    }
+
+    function resetGame() {
+        secretNumber = Math.floor(Math.random() * 100) + 1;
+        guessCount = 0;
+        document.getElementById('guessList').innerHTML = '';
+        document.getElementById('guessInput').value = '';
+        document.getElementById('submitButton').textContent = 'Submit Guess';
+        document.getElementById('submitButton').onclick = checkGuess;
+        document.getElementById('guessInput').focus();
+        clearConfetti();
+    }
+
+    let animationId;
+
+    function clearConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Cancel the animation
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+    }
+
+    // Function to create and animate confetti
+    function createConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const confettiCount = 200;
+        const confetti = [];
+
+        // Create confetti particles
+        for (let i = 0; i < confettiCount; i++) {
+            confetti.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 5 + 1,
+                color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                speed: Math.random() * 3 + 1,
+                angle: Math.random() * 360
+            });
         }
 
-        let animationId;
-
-        function clearConfetti() {
-            const canvas = document.getElementById('confettiCanvas');
-            const ctx = canvas.getContext('2d');
+        // Animation function for confetti
+        function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Cancel the animation
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-        }
 
-        // Function to create and animate confetti
-        function createConfetti() {
-            const canvas = document.getElementById('confettiCanvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            for (let i = 0; i < confetti.length; i++) {
+                const c = confetti[i];
+                
+                // Draw each confetti particle
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.size, 0, 2 * Math.PI);
+                ctx.fillStyle = c.color;
+                ctx.fill();
 
-            const confettiCount = 200;
-            const confetti = [];
+                // Update position of confetti
+                c.y += c.speed;
+                c.x += Math.sin(c.angle) * 2;
 
-            // Create confetti particles
-            for (let i = 0; i < confettiCount; i++) {
-                confetti.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 5 + 1,
-                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-                    speed: Math.random() * 3 + 1,
-                    angle: Math.random() * 360
-                });
-            }
-
-            // Animation function for confetti
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                for (let i = 0; i < confetti.length; i++) {
-                    const c = confetti[i];
-                    
-                    // Draw each confetti particle
-                    ctx.beginPath();
-                    ctx.arc(c.x, c.y, c.size, 0, 2 * Math.PI);
-                    ctx.fillStyle = c.color;
-                    ctx.fill();
-
-                    // Update position of confetti
-                    c.y += c.speed;
-                    c.x += Math.sin(c.angle) * 2;
-
-                    // Reset confetti when it goes off screen
-                    if (c.y > canvas.height) {
-                        confetti[i] = {
-                            x: Math.random() * canvas.width,
-                            y: 0,
-                            size: c.size,
-                            color: c.color,
-                            speed: c.speed,
-                            angle: c.angle
-                        };
-                    }
-                }
-
-                // Store the animation ID
-                animationId = requestAnimationFrame(animate);
-            }
-
-            // Start the confetti animation
-            animate();
-        }
-
-        // Update the event listener for the Enter key
-        document.getElementById('guessInput').addEventListener('keyup', function(event) {
-            if (event.key === 'Enter') {
-                if (document.getElementById('submitButton').textContent === 'Play Again') {
-                    resetGame();
-                } else {
-                    checkGuess();
+                // Reset confetti when it goes off screen
+                if (c.y > canvas.height) {
+                    confetti[i] = {
+                        x: Math.random() * canvas.width,
+                        y: 0,
+                        size: c.size,
+                        color: c.color,
+                        speed: c.speed,
+                        angle: c.angle
+                    };
                 }
             }
-        });
 
-        document.getElementById('guessInput').addEventListener('input', function() {
-            this.classList.remove('error');
-            document.getElementById('errorMessage').style.display = 'none';
-        });
-        // Set focus to the input field when the page loads
-        window.onload = function() {
-            document.getElementById('guessInput').focus();
-        };
+            // Store the animation ID
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Start the confetti animation
+        animate();
+    }
+
+    // Update the event listener for the Enter key
+    document.getElementById('guessInput').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            if (document.getElementById('submitButton').textContent === 'Play Again') {
+                resetGame();
+            } else {
+                checkGuess();
+            }
+        }
+    });
+
+    document.getElementById('guessInput').addEventListener('input', function() {
+        this.classList.remove('error');
+        document.getElementById('errorMessage').style.display = 'none';
+    });
+    // Set focus to the input field when the page loads
+    window.onload = function() {
+        document.getElementById('guessInput').focus();
+    };
+});
     </script>
     </body>
 </html>

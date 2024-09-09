@@ -93,17 +93,22 @@
 
     </style>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=360, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="counter.js"></script>
+        <link rel="stylesheet" href="visitcounter.css">
         <title>tic-tac-toe</title>
     </head>
-
+    <audio id="winSound" src="https://www.myinstants.com/media/sounds/everybody-dance.mp3"></audio>
     <body>
         <div class="game-container">
             <h1>tic-tac-toe</h1>
             <div id="board"></div>
             <div id="status"></div>
             <button id="playAgain" style="display: none;">Play Again</button>
+            <div id="visitCounter"><span id="visitCount">0</span></div>
         </div>
+
         <canvas id="confettiCanvas"></canvas>
 
         <script>
@@ -140,6 +145,7 @@
                     showPlayAgainButton();
                     if (currentPlayer === 'X') {
                         createConfetti();
+                        document.getElementById('winSound').play();
                     }
                 } else if (gameBoard.every(cell => cell !== '')) {
                     status.textContent = "It's a draw!";
@@ -284,8 +290,12 @@
             }
         }
 
-        createBoard();
-        status.textContent = "Your turn";
+        document.addEventListener('DOMContentLoaded', () => {
+            createBoard();
+            status.textContent = "Your turn";
+            updateVisitCount('visitCount');
+        });
+
     </script>
     </body>
 
