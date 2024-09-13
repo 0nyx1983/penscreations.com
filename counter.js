@@ -1,5 +1,5 @@
 const { createClient } = supabase;
-const isLocalEnvironment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isLocalEnvironment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === ''; 
 // const isLocalEnvironment = false;
 const supabaseUrl = 'https://tseekljllrtadseeehur.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzZWVrbGpsbHJ0YWRzZWVlaHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU3ODg5MTAsImV4cCI6MjA0MTM2NDkxMH0.uzNsW8X43C46_vO_XQ481xeuEZ398V7nVnIMu0LcFY8';
