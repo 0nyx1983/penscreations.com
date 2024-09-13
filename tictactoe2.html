@@ -92,21 +92,62 @@
             color: #0ff;
             text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 15px #0ff;
         }
+        #difficultySelect {
+            background-color: #000;
+            color: #0ff;
+            border: 2px solid #0ff;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 16px;
+            text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+            box-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+            transition: all 0.3s ease;
+        }
 
+        #difficultySelect:hover {
+            background-color: #0ff;
+            color: #000;
+            text-shadow: none;
+        }
+
+        #difficultySelect option {
+            background-color: #000;
+            color: #0ff;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 5px #0ff, 0 0 10px #0ff; }
+            50% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff; }
+            100% { box-shadow: 0 0 5px #0ff, 0 0 10px #0ff; }
+        }
+
+        #difficultySelect {
+            animation: pulse 2s infinite;
+        }
+        #difficultySelect {
+            margin: 20px 0;
+        }
     </style>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=360, initial-scale=1.0">
-        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
         <script src="counter.js"></script>
         <link rel="stylesheet" href="visitcounter.css">
         <title>tic-tac-toe</title>
     </head>
-    <audio id="winSound" src="https://www.myinstants.com/media/sounds/everybody-dance.mp3"></audio>
+    <audio id="winSound"
+        src="https://www.myinstants.com/media/sounds/everybody-dance.mp3"></audio>
     <body>
         <div class="game-container">
             <h1>tic-tac-toe</h1>
             <div id="board"></div>
             <div id="status"></div>
+            <select id="difficultySelect">
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
             <button id="playAgain" style="display: none;">Play Again</button>
             <div id="visitCounter"><span id="visitCount">0</span></div>
         </div>
@@ -160,22 +201,91 @@
                 }
             }
         }
-
         function computerMove() {
             if (!gameActive) return;
+            
+            const difficulty = document.getElementById('difficultySelect').value;
+            let move;
+
+            switch(difficulty) {
+                case 'easy':
+                    move = getRandomMove();
+                    break;
+                case 'medium':
+                    move = getMediumMove();
+                    break;
+                case 'hard':
+                    move = getHardMove();
+                    break;
+                default:
+                    move = getRandomMove();
+            }
+
+            makeMove(move);
+        }
+
+        function getRandomMove() {
             let availableMoves = gameBoard.reduce((acc, cell, index) => {
                 if (cell === '') acc.push(index);
                 return acc;
             }, []);
-            let randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-            gameBoard[randomMove] = currentPlayer;
-            const cell = document.querySelector(`[data-index="${randomMove}"]`);
+            return availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        }
+
+        function getMediumMove() {
+            const centerIndex = 4;
+            const cornerIndices = [0, 2, 6, 8];
+            
+            if (gameBoard[centerIndex] === '') return centerIndex;
+            
+            const availableCorners = cornerIndices.filter(index => gameBoard[index] === '');
+            if (availableCorners.length > 0) {
+                return availableCorners[Math.floor(Math.random() * availableCorners.length)];
+            }
+            
+            return getRandomMove();
+        }
+
+        function getHardMove() {
+            // Check for winning move
+            const winningMove = findWinningMove('O');
+            if (winningMove !== -1) return winningMove;
+
+            // Block player's winning move
+            const blockingMove = findWinningMove('X');
+            if (blockingMove !== -1) return blockingMove;
+
+            // If no winning or blocking moves, use medium strategy
+            return getMediumMove();
+        }
+
+        function findWinningMove(player) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6] // Diagonals
+            ];
+
+            for (let pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (gameBoard[a] === player && gameBoard[b] === player && gameBoard[c] === '') return c;
+                if (gameBoard[a] === player && gameBoard[c] === player && gameBoard[b] === '') return b;
+                if (gameBoard[b] === player && gameBoard[c] === player && gameBoard[a] === '') return a;
+            }
+
+            return -1;
+        }
+
+        function makeMove(index) {
+            gameBoard[index] = currentPlayer;
+            const cell = document.querySelector(`[data-index="${index}"]`);
             cell.textContent = currentPlayer;
             cell.setAttribute('data-player', currentPlayer);
-            document.querySelector(`[data-index="${randomMove}"]`).textContent = currentPlayer;
+
             if (checkWin()) {
                 status.textContent = `Computer wins!`;
                 gameActive = false;
+                showPlayAgainButton();
             } else if (gameBoard.every(cell => cell !== '')) {
                 status.textContent = "It's a draw!";
                 gameActive = false;
